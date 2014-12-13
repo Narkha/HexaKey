@@ -16,10 +16,12 @@
 
 package com.example.android.softkeyboard;
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
+import android.os.Build;
 import android.os.IBinder;
 import android.text.InputType;
 import android.text.method.MetaKeyKeyListener;
@@ -32,7 +34,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,10 +122,13 @@ public class SoftKeyboard extends InputMethodService
         return mInputView;
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT) 
     private void setLatinKeyboard(LatinKeyboard nextKeyboard) {
-        final boolean shouldSupportLanguageSwitchKey =
-                mInputMethodManager.shouldOfferSwitchingToNextInputMethod(getToken());
-        nextKeyboard.setLanguageSwitchKeyVisibility(shouldSupportLanguageSwitchKey);
+    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+	        final boolean shouldSupportLanguageSwitchKey =
+	                mInputMethodManager.shouldOfferSwitchingToNextInputMethod(getToken());
+	        nextKeyboard.setLanguageSwitchKeyVisibility(shouldSupportLanguageSwitchKey);
+    	}
         mInputView.setKeyboard(nextKeyboard);
     }
 
