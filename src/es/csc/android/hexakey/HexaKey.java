@@ -53,7 +53,7 @@ public class HexaKey extends InputMethodService
     
     private LatinKeyboard symbolsKeyboard;
     private LatinKeyboard symbolsShiftedKeyboard;
-    private LatinKeyboard qwertyKeyboard;
+    private LatinKeyboard lettersKeyboard;
     
     private LatinKeyboard curKeyboard;
     
@@ -75,7 +75,7 @@ public class HexaKey extends InputMethodService
      * is called after creation and any configuration change.
      */
     @Override public void onInitializeInterface() {
-        if (qwertyKeyboard != null) {
+        if (lettersKeyboard != null) {
             // Configuration changes can happen after the keyboard gets recreated,
             // so we need to be able to re-build the keyboards if the available
             // space has changed.
@@ -83,7 +83,7 @@ public class HexaKey extends InputMethodService
             if (displayWidth == lastDisplayWidth) return;
             lastDisplayWidth = displayWidth;
         }
-        qwertyKeyboard = new LatinKeyboard(this, R.xml.qwerty);
+        lettersKeyboard = new LatinKeyboard(this, R.xml.letters);
         symbolsKeyboard = new LatinKeyboard(this, R.xml.symbols);
         symbolsShiftedKeyboard = new LatinKeyboard(this, R.xml.symbols_shift);
     }
@@ -99,7 +99,7 @@ public class HexaKey extends InputMethodService
         mInputView = (LatinKeyboardView) getLayoutInflater().inflate(
                 R.layout.input, null);
         mInputView.setOnKeyboardActionListener(this);
-        setLatinKeyboard(qwertyKeyboard);
+        setLatinKeyboard(lettersKeyboard);
         return mInputView;
     }
 
@@ -157,7 +157,7 @@ public class HexaKey extends InputMethodService
                 // normal alphabetic keyboard, and assume that we should
                 // be doing predictive text (showing candidates as the
                 // user types).
-                curKeyboard = qwertyKeyboard;               
+                curKeyboard = lettersKeyboard;               
                 
                 // We also want to look at the current state of the editor
                 // to decide whether our alphabetic keyboard should start out
@@ -168,7 +168,7 @@ public class HexaKey extends InputMethodService
             default:
                 // For all unknown input types, default to the alphabetic
                 // keyboard with no special features.
-                curKeyboard = qwertyKeyboard;
+                curKeyboard = lettersKeyboard;
                 updateShiftKeyState(attribute);
         }
         
@@ -185,7 +185,7 @@ public class HexaKey extends InputMethodService
     public void onFinishInput() {
         super.onFinishInput();
         
-        curKeyboard = qwertyKeyboard;
+        curKeyboard = lettersKeyboard;
         if (mInputView != null) {
             mInputView.closing();
         }
@@ -281,7 +281,7 @@ public class HexaKey extends InputMethodService
      */
     private void updateShiftKeyState(EditorInfo attr) {
         if (attr != null 
-                && mInputView != null && qwertyKeyboard == mInputView.getKeyboard()) {
+                && mInputView != null && lettersKeyboard == mInputView.getKeyboard()) {
             int caps = 0;
             EditorInfo ei = getCurrentInputEditorInfo();
             if (ei != null && ei.inputType != InputType.TYPE_NULL) {
@@ -341,7 +341,7 @@ public class HexaKey extends InputMethodService
                 && mInputView != null) {
             Keyboard current = mInputView.getKeyboard();
             if (current == symbolsKeyboard || current == symbolsShiftedKeyboard) {
-                setLatinKeyboard(qwertyKeyboard);
+                setLatinKeyboard(lettersKeyboard);
             } else {
                 setLatinKeyboard(symbolsKeyboard);
                 symbolsKeyboard.setShifted(false);
@@ -380,7 +380,7 @@ public class HexaKey extends InputMethodService
         }
         
         Keyboard currentKeyboard = mInputView.getKeyboard();
-        if (qwertyKeyboard == currentKeyboard) {
+        if (lettersKeyboard == currentKeyboard) {
             // Alphabet keyboard
             checkToggleCapsLock();
             mInputView.setShifted(capsLock || !mInputView.isShifted());
