@@ -52,22 +52,22 @@ public class HexaKey extends InputMethodService
      */
     static final boolean PROCESS_HARD_KEYS = true;
 
-    private InputMethodManager mInputMethodManager;
+    private InputMethodManager inputMethodManager;
 
     private LatinKeyboardView mInputView;
     
-    private int mLastDisplayWidth;
-    private boolean mCapsLock;
-    private long mLastShiftTime;
-    private long mMetaState;
+    private int lastDisplayWidth;
+    private boolean capsLock;
+    private long lastShiftTime;
+    private long metaState;
     
-    private LatinKeyboard mSymbolsKeyboard;
-    private LatinKeyboard mSymbolsShiftedKeyboard;
-    private LatinKeyboard mQwertyKeyboard;
+    private LatinKeyboard symbolsKeyboard;
+    private LatinKeyboard symbolsShiftedKeyboard;
+    private LatinKeyboard qwertyKeyboard;
     
-    private LatinKeyboard mCurKeyboard;
+    private LatinKeyboard curKeyboard;
     
-    private String mWordSeparators;
+    private String wordSeparators;
     
     /**
      * Main initialization of the input method component.  Be sure to call
@@ -76,8 +76,8 @@ public class HexaKey extends InputMethodService
     @Override 
     public void onCreate() {
         super.onCreate();
-        mInputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-        mWordSeparators = getResources().getString(R.string.word_separators);
+        inputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        wordSeparators = getResources().getString(R.string.word_separators);
     }
     
     /**
@@ -85,17 +85,17 @@ public class HexaKey extends InputMethodService
      * is called after creation and any configuration change.
      */
     @Override public void onInitializeInterface() {
-        if (mQwertyKeyboard != null) {
+        if (qwertyKeyboard != null) {
             // Configuration changes can happen after the keyboard gets recreated,
             // so we need to be able to re-build the keyboards if the available
             // space has changed.
             int displayWidth = getMaxWidth();
-            if (displayWidth == mLastDisplayWidth) return;
-            mLastDisplayWidth = displayWidth;
+            if (displayWidth == lastDisplayWidth) return;
+            lastDisplayWidth = displayWidth;
         }
-        mQwertyKeyboard = new LatinKeyboard(this, R.xml.qwerty);
-        mSymbolsKeyboard = new LatinKeyboard(this, R.xml.symbols);
-        mSymbolsShiftedKeyboard = new LatinKeyboard(this, R.xml.symbols_shift);
+        qwertyKeyboard = new LatinKeyboard(this, R.xml.qwerty);
+        symbolsKeyboard = new LatinKeyboard(this, R.xml.symbols);
+        symbolsShiftedKeyboard = new LatinKeyboard(this, R.xml.symbols_shift);
     }
     
     /**
@@ -109,7 +109,7 @@ public class HexaKey extends InputMethodService
         mInputView = (LatinKeyboardView) getLayoutInflater().inflate(
                 R.layout.input, null);
         mInputView.setOnKeyboardActionListener(this);
-        setLatinKeyboard(mQwertyKeyboard);
+        setLatinKeyboard(qwertyKeyboard);
         return mInputView;
     }
 
@@ -117,7 +117,7 @@ public class HexaKey extends InputMethodService
     private void setLatinKeyboard(LatinKeyboard nextKeyboard) {
     	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 	        final boolean shouldSupportLanguageSwitchKey =
-	                mInputMethodManager.shouldOfferSwitchingToNextInputMethod(getToken());
+	                inputMethodManager.shouldOfferSwitchingToNextInputMethod(getToken());
 	        nextKeyboard.setLanguageSwitchKeyVisibility(shouldSupportLanguageSwitchKey);
     	}
         mInputView.setKeyboard(nextKeyboard);
@@ -143,7 +143,7 @@ public class HexaKey extends InputMethodService
         
         if (!restarting) {
             // Clear shift states.
-            mMetaState = 0;
+            metaState = 0;
         }
         
         // We are now going to initialize our state based on the type of
@@ -153,13 +153,13 @@ public class HexaKey extends InputMethodService
             case InputType.TYPE_CLASS_DATETIME:
                 // Numbers and dates default to the symbols keyboard, with
                 // no extra features.
-                mCurKeyboard = mSymbolsKeyboard;
+                curKeyboard = symbolsKeyboard;
                 break;
                 
             case InputType.TYPE_CLASS_PHONE:
                 // Phones will also default to the symbols keyboard, though
                 // often you will want to have a dedicated phone keyboard.
-                mCurKeyboard = mSymbolsKeyboard;
+                curKeyboard = symbolsKeyboard;
                 break;
                 
             case InputType.TYPE_CLASS_TEXT:
@@ -167,7 +167,7 @@ public class HexaKey extends InputMethodService
                 // normal alphabetic keyboard, and assume that we should
                 // be doing predictive text (showing candidates as the
                 // user types).
-                mCurKeyboard = mQwertyKeyboard;               
+                curKeyboard = qwertyKeyboard;               
                 
                 // We also want to look at the current state of the editor
                 // to decide whether our alphabetic keyboard should start out
@@ -178,13 +178,13 @@ public class HexaKey extends InputMethodService
             default:
                 // For all unknown input types, default to the alphabetic
                 // keyboard with no special features.
-                mCurKeyboard = mQwertyKeyboard;
+                curKeyboard = qwertyKeyboard;
                 updateShiftKeyState(attribute);
         }
         
         // Update the label on the enter key, depending on what the application
         // says it will do.
-        mCurKeyboard.setImeOptions(getResources(), attribute.imeOptions);
+        curKeyboard.setImeOptions(getResources(), attribute.imeOptions);
     }
 
     /**
@@ -195,7 +195,7 @@ public class HexaKey extends InputMethodService
     public void onFinishInput() {
         super.onFinishInput();
         
-        mCurKeyboard = mQwertyKeyboard;
+        curKeyboard = qwertyKeyboard;
         if (mInputView != null) {
             mInputView.closing();
         }
@@ -205,9 +205,9 @@ public class HexaKey extends InputMethodService
     public void onStartInputView(EditorInfo attribute, boolean restarting) {
         super.onStartInputView(attribute, restarting);
         // Apply the selected keyboard to the input view.
-        setLatinKeyboard(mCurKeyboard);
+        setLatinKeyboard(curKeyboard);
         mInputView.closing();
-        final InputMethodSubtype subtype = mInputMethodManager.getCurrentInputMethodSubtype();
+        final InputMethodSubtype subtype = inputMethodManager.getCurrentInputMethodSubtype();
         mInputView.setSubtypeOnSpaceKey(subtype);
     }
 
@@ -233,10 +233,10 @@ public class HexaKey extends InputMethodService
      * PROCESS_HARD_KEYS option.
      */
     private boolean translateKeyDown(int keyCode, KeyEvent event) {
-        mMetaState = MetaKeyKeyListener.handleKeyDown(mMetaState,
+        metaState = MetaKeyKeyListener.handleKeyDown(metaState,
                 keyCode, event);
-        int c = event.getUnicodeChar(MetaKeyKeyListener.getMetaState(mMetaState));
-        mMetaState = MetaKeyKeyListener.adjustMetaAfterKeypress(mMetaState);
+        int c = event.getUnicodeChar(MetaKeyKeyListener.getMetaState(metaState));
+        metaState = MetaKeyKeyListener.adjustMetaAfterKeypress(metaState);
         InputConnection ic = getCurrentInputConnection();
         if (c == 0 || ic == null) {
             return false;
@@ -318,13 +318,13 @@ public class HexaKey extends InputMethodService
      */
     private void updateShiftKeyState(EditorInfo attr) {
         if (attr != null 
-                && mInputView != null && mQwertyKeyboard == mInputView.getKeyboard()) {
+                && mInputView != null && qwertyKeyboard == mInputView.getKeyboard()) {
             int caps = 0;
             EditorInfo ei = getCurrentInputEditorInfo();
             if (ei != null && ei.inputType != InputType.TYPE_NULL) {
                 caps = getCurrentInputConnection().getCursorCapsMode(attr.inputType);
             }
-            mInputView.setShifted(mCapsLock || caps != 0);
+            mInputView.setShifted(capsLock || caps != 0);
         }
     }
     
@@ -377,11 +377,11 @@ public class HexaKey extends InputMethodService
         } else if (primaryCode == Keyboard.KEYCODE_MODE_CHANGE
                 && mInputView != null) {
             Keyboard current = mInputView.getKeyboard();
-            if (current == mSymbolsKeyboard || current == mSymbolsShiftedKeyboard) {
-                setLatinKeyboard(mQwertyKeyboard);
+            if (current == symbolsKeyboard || current == symbolsShiftedKeyboard) {
+                setLatinKeyboard(qwertyKeyboard);
             } else {
-                setLatinKeyboard(mSymbolsKeyboard);
-                mSymbolsKeyboard.setShifted(false);
+                setLatinKeyboard(symbolsKeyboard);
+                symbolsKeyboard.setShifted(false);
             }
         } else {
             handleCharacter(primaryCode, keyCodes);
@@ -417,18 +417,18 @@ public class HexaKey extends InputMethodService
         }
         
         Keyboard currentKeyboard = mInputView.getKeyboard();
-        if (mQwertyKeyboard == currentKeyboard) {
+        if (qwertyKeyboard == currentKeyboard) {
             // Alphabet keyboard
             checkToggleCapsLock();
-            mInputView.setShifted(mCapsLock || !mInputView.isShifted());
-        } else if (currentKeyboard == mSymbolsKeyboard) {
-            mSymbolsKeyboard.setShifted(true);
-            setLatinKeyboard(mSymbolsShiftedKeyboard);
-            mSymbolsShiftedKeyboard.setShifted(true);
-        } else if (currentKeyboard == mSymbolsShiftedKeyboard) {
-            mSymbolsShiftedKeyboard.setShifted(false);
-            setLatinKeyboard(mSymbolsKeyboard);
-            mSymbolsKeyboard.setShifted(false);
+            mInputView.setShifted(capsLock || !mInputView.isShifted());
+        } else if (currentKeyboard == symbolsKeyboard) {
+            symbolsKeyboard.setShifted(true);
+            setLatinKeyboard(symbolsShiftedKeyboard);
+            symbolsShiftedKeyboard.setShifted(true);
+        } else if (currentKeyboard == symbolsShiftedKeyboard) {
+            symbolsShiftedKeyboard.setShifted(false);
+            setLatinKeyboard(symbolsKeyboard);
+            symbolsKeyboard.setShifted(false);
         }
     }
     
@@ -460,21 +460,21 @@ public class HexaKey extends InputMethodService
     }
 
     private void handleLanguageSwitch() {
-        mInputMethodManager.switchToNextInputMethod(getToken(), false /* onlyCurrentIme */);
+        inputMethodManager.switchToNextInputMethod(getToken(), false /* onlyCurrentIme */);
     }
 
     private void checkToggleCapsLock() {
         long now = System.currentTimeMillis();
-        if (mLastShiftTime + 800 > now) {
-            mCapsLock = !mCapsLock;
-            mLastShiftTime = 0;
+        if (lastShiftTime + 800 > now) {
+            capsLock = !capsLock;
+            lastShiftTime = 0;
         } else {
-            mLastShiftTime = now;
+            lastShiftTime = now;
         }
     }
     
     private String getWordSeparators() {
-        return mWordSeparators;
+        return wordSeparators;
     }
     
     public boolean isWordSeparator(int code) {

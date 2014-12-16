@@ -28,31 +28,31 @@ import android.view.inputmethod.InputMethodManager;
 
 public class LatinKeyboard extends Keyboard {
 
-    private Key mEnterKey;
-    private Key mSpaceKey;
+    private Key enterKey;
+    private Key spaceKey;
     /**
      * Stores the current state of the mode change key. Its width will be dynamically updated to
-     * match the region of {@link #mModeChangeKey} when {@link #mModeChangeKey} becomes invisible.
+     * match the region of {@link #modeChangeKey} when {@link #modeChangeKey} becomes invisible.
      */
-    private Key mModeChangeKey;
+    private Key modeChangeKey;
     /**
      * Stores the current state of the language switch key (a.k.a. globe key). This should be
      * visible while {@link InputMethodManager#shouldOfferSwitchingToNextInputMethod(IBinder)}
      * returns true. When this key becomes invisible, its width will be shrunk to zero.
      */
-    private Key mLanguageSwitchKey;
+    private Key languageSwitchKey;
     /**
-     * Stores the size and other information of {@link #mModeChangeKey} when
-     * {@link #mLanguageSwitchKey} is visible. This should be immutable and will be used only as a
-     * reference size when the visibility of {@link #mLanguageSwitchKey} is changed.
+     * Stores the size and other information of {@link #modeChangeKey} when
+     * {@link #languageSwitchKey} is visible. This should be immutable and will be used only as a
+     * reference size when the visibility of {@link #languageSwitchKey} is changed.
      */
-    private Key mSavedModeChangeKey;
+    private Key savedModeChangeKey;
     /**
-     * Stores the size and other information of {@link #mLanguageSwitchKey} when it is visible.
+     * Stores the size and other information of {@link #languageSwitchKey} when it is visible.
      * This should be immutable and will be used only as a reference size when the visibility of
-     * {@link #mLanguageSwitchKey} is changed.
+     * {@link #languageSwitchKey} is changed.
      */
-    private Key mSavedLanguageSwitchKey;
+    private Key savedLanguageSwitchKey;
     
     public LatinKeyboard(Context context, int xmlLayoutResId) {
         super(context, xmlLayoutResId);
@@ -68,15 +68,15 @@ public class LatinKeyboard extends Keyboard {
             XmlResourceParser parser) {
         Key key = new LatinKey(res, parent, x, y, parser);
         if (key.codes[0] == 10) {
-            mEnterKey = key;
+            enterKey = key;
         } else if (key.codes[0] == ' ') {
-            mSpaceKey = key;
+            spaceKey = key;
         } else if (key.codes[0] == Keyboard.KEYCODE_MODE_CHANGE) {
-            mModeChangeKey = key;
-            mSavedModeChangeKey = new LatinKey(res, parent, x, y, parser);
+            modeChangeKey = key;
+            savedModeChangeKey = new LatinKey(res, parent, x, y, parser);
         } else if (key.codes[0] == LatinKeyboardView.KEYCODE_LANGUAGE_SWITCH) {
-            mLanguageSwitchKey = key;
-            mSavedLanguageSwitchKey = new LatinKey(res, parent, x, y, parser);
+            languageSwitchKey = key;
+            savedLanguageSwitchKey = new LatinKey(res, parent, x, y, parser);
         }
         return key;
     }
@@ -89,18 +89,18 @@ public class LatinKeyboard extends Keyboard {
         if (visible) {
             // The language switch key should be visible. Restore the size of the mode change key
             // and language switch key using the saved layout.
-            mModeChangeKey.width = mSavedModeChangeKey.width;
-            mModeChangeKey.x = mSavedModeChangeKey.x;
-            mLanguageSwitchKey.width = mSavedLanguageSwitchKey.width;
-            mLanguageSwitchKey.icon = mSavedLanguageSwitchKey.icon;
-            mLanguageSwitchKey.iconPreview = mSavedLanguageSwitchKey.iconPreview;
+            modeChangeKey.width = savedModeChangeKey.width;
+            modeChangeKey.x = savedModeChangeKey.x;
+            languageSwitchKey.width = savedLanguageSwitchKey.width;
+            languageSwitchKey.icon = savedLanguageSwitchKey.icon;
+            languageSwitchKey.iconPreview = savedLanguageSwitchKey.iconPreview;
         } else {
             // The language switch key should be hidden. Change the width of the mode change key
             // to fill the space of the language key so that the user will not see any strange gap.
-            mModeChangeKey.width = mSavedModeChangeKey.width + mSavedLanguageSwitchKey.width;
-            mLanguageSwitchKey.width = 0;
-            mLanguageSwitchKey.icon = null;
-            mLanguageSwitchKey.iconPreview = null;
+            modeChangeKey.width = savedModeChangeKey.width + savedLanguageSwitchKey.width;
+            languageSwitchKey.width = 0;
+            languageSwitchKey.icon = null;
+            languageSwitchKey.iconPreview = null;
         }
     }
 
@@ -109,40 +109,40 @@ public class LatinKeyboard extends Keyboard {
      * appropriate label on the keyboard's enter key (if it has one).
      */
     void setImeOptions(Resources res, int options) {
-        if (mEnterKey == null) {
+        if (enterKey == null) {
             return;
         }
 
         switch (options&(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_FLAG_NO_ENTER_ACTION)) {
             case EditorInfo.IME_ACTION_GO:
-                mEnterKey.iconPreview = null;
-                mEnterKey.icon = null;
-                mEnterKey.label = res.getText(R.string.label_go_key);
+                enterKey.iconPreview = null;
+                enterKey.icon = null;
+                enterKey.label = res.getText(R.string.label_go_key);
                 break;
             case EditorInfo.IME_ACTION_NEXT:
-                mEnterKey.iconPreview = null;
-                mEnterKey.icon = null;
-                mEnterKey.label = res.getText(R.string.label_next_key);
+                enterKey.iconPreview = null;
+                enterKey.icon = null;
+                enterKey.label = res.getText(R.string.label_next_key);
                 break;
             case EditorInfo.IME_ACTION_SEARCH:
-                mEnterKey.icon = res.getDrawable(R.drawable.sym_keyboard_search);
-                mEnterKey.label = null;
+                enterKey.icon = res.getDrawable(R.drawable.sym_keyboard_search);
+                enterKey.label = null;
                 break;
             case EditorInfo.IME_ACTION_SEND:
-                mEnterKey.iconPreview = null;
-                mEnterKey.icon = null;
-                mEnterKey.label = res.getText(R.string.label_send_key);
+                enterKey.iconPreview = null;
+                enterKey.icon = null;
+                enterKey.label = res.getText(R.string.label_send_key);
                 break;
             default:
-                mEnterKey.icon = res.getDrawable(R.drawable.sym_keyboard_return);
-                mEnterKey.label = null;
+                enterKey.icon = res.getDrawable(R.drawable.sym_keyboard_return);
+                enterKey.label = null;
                 break;
         }
     }
 
     void setSpaceIcon(final Drawable icon) {
-        if (mSpaceKey != null) {
-            mSpaceKey.icon = icon;
+        if (spaceKey != null) {
+            spaceKey.icon = icon;
         }
     }
 
