@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.example.android.softkeyboard;
+package es.csc.android.hexakey;
+
+import es.csc.android.hexakey.R;
 
 import android.content.Context;
 import android.content.res.Resources;

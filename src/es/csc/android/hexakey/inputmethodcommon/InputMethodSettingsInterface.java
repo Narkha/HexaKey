@@ -20,7 +20,7 @@
  * Project.
  */
 
-package com.android.inputmethodcommon;
+package es.csc.android.hexakey.inputmethodcommon;
 
 import android.graphics.drawable.Drawable;
 

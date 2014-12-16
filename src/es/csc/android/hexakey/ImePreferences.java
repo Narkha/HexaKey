@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.example.android.softkeyboard;
+package es.csc.android.hexakey;
+
+import es.csc.android.hexakey.R;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import com.android.inputmethodcommon.InputMethodSettingsFragment;
+import es.csc.android.hexakey.inputmethodcommon.InputMethodSettingsFragment;
 
 /**
  * Displays the IME preferences inside the input method setting.

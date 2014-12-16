@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.softkeyboard;
+package es.csc.android.hexakey;
 
 import android.annotation.TargetApi;
 import android.app.Dialog;
@@ -33,16 +33,12 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
+
 import java.util.List;
 
-/**
- * Example of writing an input method for a soft keyboard.  This code is
- * focused on simplicity over completeness, so it should in no way be considered
- * to be a complete soft keyboard implementation.  Its purpose is to provide
- * a basic example for how you would get started writing an input method, to
- * be fleshed out as appropriate.
- */
-public class SoftKeyboard extends InputMethodService 
+import es.csc.android.hexakey.R;
+
+public class HexaKey extends InputMethodService 
         implements KeyboardView.OnKeyboardActionListener {
     static final boolean DEBUG = false;
     
