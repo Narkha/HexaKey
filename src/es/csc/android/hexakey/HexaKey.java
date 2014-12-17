@@ -44,7 +44,7 @@ public class HexaKey extends InputMethodService
 
     private InputMethodManager inputMethodManager;
 
-    private LatinKeyboardView mInputView;
+    private LatinKeyboardView inputView;
     
     private int lastDisplayWidth;
     private boolean capsLock;
@@ -74,7 +74,8 @@ public class HexaKey extends InputMethodService
      * This is the point where you can do all of your UI initialization.  It
      * is called after creation and any configuration change.
      */
-    @Override public void onInitializeInterface() {
+    @Override 
+    public void onInitializeInterface() {
         if (lettersKeyboard != null) {
             // Configuration changes can happen after the keyboard gets recreated,
             // so we need to be able to re-build the keyboards if the available
@@ -96,11 +97,12 @@ public class HexaKey extends InputMethodService
      */
     @Override 
     public View onCreateInputView() {
-        mInputView = (LatinKeyboardView) getLayoutInflater().inflate(
-                R.layout.input, null);
-        mInputView.setOnKeyboardActionListener(this);
+        inputView = (LatinKeyboardView) getLayoutInflater()
+        				.inflate(R.layout.input, null);
+		inputView.updatePadding(getMaxWidth());
+        inputView.setOnKeyboardActionListener(this);
         setLatinKeyboard(lettersKeyboard);
-        return mInputView;
+        return inputView;
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT) 
@@ -110,7 +112,7 @@ public class HexaKey extends InputMethodService
 	                inputMethodManager.shouldOfferSwitchingToNextInputMethod(getToken());
 	        nextKeyboard.setLanguageSwitchKeyVisibility(shouldSupportLanguageSwitchKey);
     	}
-        mInputView.setKeyboard(nextKeyboard);
+        inputView.setKeyboard(nextKeyboard);
     }
 
     /**
@@ -128,7 +130,8 @@ public class HexaKey extends InputMethodService
      * bound to the client, and are now receiving all of the detailed information
      * about the target of our edits.
      */
-    @Override public void onStartInput(EditorInfo attribute, boolean restarting) {
+    @Override 
+    public void onStartInput(EditorInfo attribute, boolean restarting) {
         super.onStartInput(attribute, restarting);
         
         if (!restarting) {
@@ -186,8 +189,8 @@ public class HexaKey extends InputMethodService
         super.onFinishInput();
         
         curKeyboard = lettersKeyboard;
-        if (mInputView != null) {
-            mInputView.closing();
+        if (inputView != null) {
+            inputView.closing();
         }
     }
     
@@ -196,14 +199,14 @@ public class HexaKey extends InputMethodService
         super.onStartInputView(attribute, restarting);
         // Apply the selected keyboard to the input view.
         setLatinKeyboard(curKeyboard);
-        mInputView.closing();
+        inputView.closing();
         final InputMethodSubtype subtype = inputMethodManager.getCurrentInputMethodSubtype();
-        mInputView.setSubtypeOnSpaceKey(subtype);
+        inputView.setSubtypeOnSpaceKey(subtype);
     }
 
     @Override
     public void onCurrentInputMethodSubtypeChanged(InputMethodSubtype subtype) {
-        mInputView.setSubtypeOnSpaceKey(subtype);
+        inputView.setSubtypeOnSpaceKey(subtype);
     }
 
     /**
@@ -257,8 +260,8 @@ public class HexaKey extends InputMethodService
                 // key for us, to dismiss the input method if it is shown.
                 // However, our keyboard could be showing a pop-up window
                 // that back should dismiss, so we first allow it to do that.
-                if (event.getRepeatCount() == 0 && mInputView != null) {
-                    if (mInputView.handleBack()) {
+                if (event.getRepeatCount() == 0 && inputView != null) {
+                    if (inputView.handleBack()) {
                         return true;
                     }
                 }
@@ -281,13 +284,13 @@ public class HexaKey extends InputMethodService
      */
     private void updateShiftKeyState(EditorInfo attr) {
         if (attr != null 
-                && mInputView != null && lettersKeyboard == mInputView.getKeyboard()) {
+                && inputView != null && lettersKeyboard == inputView.getKeyboard()) {
             int caps = 0;
             EditorInfo ei = getCurrentInputEditorInfo();
             if (ei != null && ei.inputType != InputType.TYPE_NULL) {
                 caps = getCurrentInputConnection().getCursorCapsMode(attr.inputType);
             }
-            mInputView.setShifted(capsLock || caps != 0);
+            inputView.setShifted(capsLock || caps != 0);
         }
     }
     
@@ -335,8 +338,8 @@ public class HexaKey extends InputMethodService
         } else if (primaryCode == LatinKeyboardView.KEYCODE_OPTIONS) {
             // Show a menu or somethin'
         } else if (primaryCode == Keyboard.KEYCODE_MODE_CHANGE
-                && mInputView != null) {
-            Keyboard current = mInputView.getKeyboard();
+                && inputView != null) {
+            Keyboard current = inputView.getKeyboard();
             if (current == symbolsKeyboard || current == symbolsShiftedKeyboard) {
                 setLatinKeyboard(lettersKeyboard);
             } else {
@@ -372,15 +375,15 @@ public class HexaKey extends InputMethodService
     }
 
     private void handleShift() {
-        if (mInputView == null) {
+        if (inputView == null) {
             return;
         }
         
-        Keyboard currentKeyboard = mInputView.getKeyboard();
+        Keyboard currentKeyboard = inputView.getKeyboard();
         if (lettersKeyboard == currentKeyboard) {
             // Alphabet keyboard
             checkToggleCapsLock();
-            mInputView.setShifted(capsLock || !mInputView.isShifted());
+            inputView.setShifted(capsLock || !inputView.isShifted());
         } else if (currentKeyboard == symbolsKeyboard) {
             symbolsKeyboard.setShifted(true);
             setLatinKeyboard(symbolsShiftedKeyboard);
@@ -394,7 +397,7 @@ public class HexaKey extends InputMethodService
     
     private void handleCharacter(int primaryCode, int[] keyCodes) {
         if (isInputViewShown()) {
-            if (mInputView.isShifted()) {
+            if (inputView.isShifted()) {
                 primaryCode = Character.toUpperCase(primaryCode);
             }
         }
@@ -404,7 +407,7 @@ public class HexaKey extends InputMethodService
 
     private void handleClose() {
         requestHideSelf(0);
-        mInputView.closing();
+        inputView.closing();
     }
 
     private IBinder getToken() {

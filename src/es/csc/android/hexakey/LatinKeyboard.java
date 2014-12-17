@@ -58,7 +58,6 @@ public class LatinKeyboard extends Keyboard {
     
     public LatinKeyboard(Context context, int xmlLayoutResId) {
         super(context, xmlLayoutResId);
-android.util.Log.d("AA", "hola?");
     }
 
     public LatinKeyboard(Context context, int layoutTemplateResId, 

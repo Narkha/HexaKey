@@ -42,13 +42,21 @@ public class LatinKeyboardView extends KeyboardView {
         if (key.codes[0] == Keyboard.KEYCODE_CANCEL) {
             getOnKeyboardActionListener().onKey(KEYCODE_OPTIONS, null);
             return true;
-        } else {
+        } 
+        else {
             return super.onLongPress(key);
         }
     }
+	
+	public void updatePadding(int maxWidth) {
+		final float keyWidth = getResources().getFraction(R.fraction.key_width, 1, 1);
+		final float totalKeysWidth = keyWidth * getResources().getInteger(R.integer.maxKeysPerRow);
+		final int remainingWidth = (int) (maxWidth * (1 - totalKeysWidth));
+		final int lateralPadding = remainingWidth  >> 1;
+		this.setPadding(lateralPadding, getPaddingTop(), lateralPadding, getPaddingBottom());
+	}
 
     void setSubtypeOnSpaceKey(final InputMethodSubtype subtype) {
-        final LatinKeyboard keyboard = (LatinKeyboard)getKeyboard();
         invalidateAllKeys();
     }
 }
