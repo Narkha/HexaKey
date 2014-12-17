@@ -329,9 +329,6 @@ public class HexaKey extends InputMethodService
             handleBackspace();
         } else if (primaryCode == Keyboard.KEYCODE_SHIFT) {
             handleShift();
-        } else if (primaryCode == Keyboard.KEYCODE_CANCEL) {
-            handleClose();
-            return;
         } else if (primaryCode == LatinKeyboardView.KEYCODE_LANGUAGE_SWITCH) {
             handleLanguageSwitch();
             return;

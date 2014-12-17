@@ -16,8 +16,10 @@
 
 package es.csc.android.hexakey;
 
-import es.csc.android.hexakey.R;
+import java.util.ArrayList;
+import java.util.List;
 
+import es.csc.android.hexakey.R;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
@@ -28,7 +30,7 @@ import android.view.inputmethod.InputMethodManager;
 
 public class LatinKeyboard extends Keyboard {
 
-    private Key enterKey;
+	private List<Key> enterKeys;
     private Key spaceKey;
     /**
      * Stores the current state of the mode change key. Its width will be dynamically updated to
@@ -56,6 +58,7 @@ public class LatinKeyboard extends Keyboard {
     
     public LatinKeyboard(Context context, int xmlLayoutResId) {
         super(context, xmlLayoutResId);
+android.util.Log.d("AA", "hola?");
     }
 
     public LatinKeyboard(Context context, int layoutTemplateResId, 
@@ -68,13 +71,19 @@ public class LatinKeyboard extends Keyboard {
             XmlResourceParser parser) {
         Key key = new LatinKey(res, parent, x, y, parser);
         if (key.codes[0] == 10) {
-            enterKey = key;
-        } else if (key.codes[0] == ' ') {
+        	if (enterKeys == null) {
+        		enterKeys = new ArrayList<Key>(2);
+        	}
+            enterKeys.add(key);
+        } 
+        else if (key.codes[0] == ' ') {
             spaceKey = key;
-        } else if (key.codes[0] == Keyboard.KEYCODE_MODE_CHANGE) {
+        } 
+        else if (key.codes[0] == Keyboard.KEYCODE_MODE_CHANGE) {
             modeChangeKey = key;
             savedModeChangeKey = new LatinKey(res, parent, x, y, parser);
-        } else if (key.codes[0] == LatinKeyboardView.KEYCODE_LANGUAGE_SWITCH) {
+        } 
+        else if (key.codes[0] == LatinKeyboardView.KEYCODE_LANGUAGE_SWITCH) {
             languageSwitchKey = key;
             savedLanguageSwitchKey = new LatinKey(res, parent, x, y, parser);
         }
@@ -109,36 +118,43 @@ public class LatinKeyboard extends Keyboard {
      * appropriate label on the keyboard's enter key (if it has one).
      */
     void setImeOptions(Resources res, int options) {
-        if (enterKey == null) {
+        if (enterKeys == null) {
             return;
         }
 
         switch (options&(EditorInfo.IME_MASK_ACTION|EditorInfo.IME_FLAG_NO_ENTER_ACTION)) {
             case EditorInfo.IME_ACTION_GO:
-                enterKey.iconPreview = null;
-                enterKey.icon = null;
-                enterKey.label = res.getText(R.string.label_go_key);
+            	updateEnterKeys(null, null, res.getText(R.string.label_go_key));
                 break;
             case EditorInfo.IME_ACTION_NEXT:
-                enterKey.iconPreview = null;
-                enterKey.icon = null;
-                enterKey.label = res.getText(R.string.label_next_key);
+            	updateEnterKeys(null, null, res.getText(R.string.label_next_key));
                 break;
             case EditorInfo.IME_ACTION_SEARCH:
-                enterKey.icon = res.getDrawable(R.drawable.sym_keyboard_search);
-                enterKey.label = null;
+            	updateEnterKeys(res.getDrawable(R.drawable.sym_keyboard_search), null);
                 break;
             case EditorInfo.IME_ACTION_SEND:
-                enterKey.iconPreview = null;
-                enterKey.icon = null;
-                enterKey.label = res.getText(R.string.label_send_key);
+            	updateEnterKeys(null, null, res.getText(R.string.label_send_key));
                 break;
             default:
-                enterKey.icon = res.getDrawable(R.drawable.sym_keyboard_return);
-                enterKey.label = null;
+            	updateEnterKeys(res.getDrawable(R.drawable.sym_keyboard_return), null);
                 break;
         }
     }
+
+    private void updateEnterKeys(Drawable icon, CharSequence label) {    	
+		for(Key enterKey : enterKeys) {
+			enterKey.icon = icon;
+			enterKey.label = label;
+		}
+	}
+    
+	private void updateEnterKeys(Drawable iconPreview, Drawable icon, CharSequence label) {
+		for(Key enterKey : enterKeys) {
+			enterKey.iconPreview = iconPreview;
+			enterKey.icon = icon;
+			enterKey.label = label;
+		}
+	}
 
     void setSpaceIcon(final Drawable icon) {
         if (spaceKey != null) {
