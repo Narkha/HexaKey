@@ -99,7 +99,7 @@ public class HexaKey extends InputMethodService
     public View onCreateInputView() {
         inputView = (LatinKeyboardView) getLayoutInflater()
         				.inflate(R.layout.input, null);
-		inputView.updatePadding(getMaxWidth());
+		inputView.autoAdjustPadding(getMaxWidth());
         inputView.setOnKeyboardActionListener(this);
         setLatinKeyboard(lettersKeyboard);
         return inputView;

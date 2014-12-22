@@ -57,7 +57,7 @@ public class LatinKeyboardView extends KeyboardView {
             
             super.onDraw(canvas);
                                    
-            BitmapDrawable newBackground = getKeyboardSnapshot(bitmap);
+            BitmapDrawable newBackground = getKeyboardScreenshot(bitmap);
                         
             this.setBackground(newBackground);                       
     	}
@@ -91,16 +91,16 @@ public class LatinKeyboardView extends KeyboardView {
 		}
 	}
 
-	private BitmapDrawable getKeyboardSnapshot(Bitmap bitmap) {
-		Bitmap KeyboardSnapshot = null;
+	private BitmapDrawable getKeyboardScreenshot(Bitmap bitmap) {
+		Bitmap KeyboardScreenshot = null;
 		if (isPortraitOrientation(bitmap)) {
-			KeyboardSnapshot = bitmap;
+			KeyboardScreenshot = bitmap;
 		}
 		else {
-			KeyboardSnapshot = cutKeyboardArea(bitmap);				
+			KeyboardScreenshot = cutKeyboardArea(bitmap);				
 		}
 		
-		return new BitmapDrawable(getResources(), KeyboardSnapshot);
+		return new BitmapDrawable(getResources(), KeyboardScreenshot);
 	}
 
 	private boolean isPortraitOrientation(Bitmap bitmap) {
@@ -125,7 +125,7 @@ public class LatinKeyboardView extends KeyboardView {
         }
     }
 	
-	public void updatePadding(int maxWidth) {
+	public void autoAdjustPadding(int maxWidth) {
 		final float keyWidth = getResources().getFraction(R.fraction.key_width, 1, 1);
 		final float totalKeysWidth = keyWidth * getResources().getInteger(R.integer.maxKeysPerRow);
 		final int remainingWidth = (int) (maxWidth * (1 - totalKeysWidth));
