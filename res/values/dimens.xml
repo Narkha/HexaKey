@@ -19,11 +19,11 @@
 -->
 
 <resources>
-    <item name="key_width" type="fraction">12%p</item>
-    <dimen name="key_height">50dip</dimen>
+    <item name="key_width" type="fraction">11.86%p</item>
+    <dimen name="key_height">52dip</dimen>
     <dimen name="key_vertical_gap">-13dip</dimen>
-    <item name="row_horizontal_gap" type="fraction">6%p</item>
-    <item name="keyboard_padding" type="fraction">2%p</item>
+    <item name="row_horizontal_gap" type="fraction">5.93%p</item>
+    <item name="keyboard_padding" type="fraction">0%p</item>
     <dimen name="candidate_font_height">16sp</dimen>
     <dimen name="candidate_vertical_padding">6sp</dimen>    
 </resources>

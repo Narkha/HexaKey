@@ -19,5 +19,8 @@
 -->
 
 <resources>
-    <dimen name="key_height">46dip</dimen>
+    <item name="key_width" type="fraction">12.5%p</item>
+    <dimen name="key_height">48dip</dimen>
+    <dimen name="key_vertical_gap">-12dip</dimen>
+    <item name="row_horizontal_gap" type="fraction">6.25%p</item>    
 </resources>
