@@ -24,8 +24,6 @@ import android.inputmethodservice.KeyboardView;
 import android.os.Build;
 import android.os.IBinder;
 import android.text.InputType;
-import android.text.method.MetaKeyKeyListener;
-import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -49,7 +47,6 @@ public class HexaKey extends InputMethodService
     private int lastDisplayWidth;
     private boolean capsLock;
     private long lastShiftTime;
-    private long metaState;
     
     private LatinKeyboard symbolsKeyboard;
     private LatinKeyboard symbolsShiftedKeyboard;
@@ -134,11 +131,6 @@ public class HexaKey extends InputMethodService
     public void onStartInput(EditorInfo attribute, boolean restarting) {
         super.onStartInput(attribute, restarting);
         
-        if (!restarting) {
-            // Clear shift states.
-            metaState = 0;
-        }
-        
         // We are now going to initialize our state based on the type of
         // text being edited.
         switch (attribute.inputType & InputType.TYPE_MASK_CLASS) {
@@ -218,33 +210,6 @@ public class HexaKey extends InputMethodService
             int candidatesStart, int candidatesEnd) {
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd,
                 candidatesStart, candidatesEnd);
-    }
-    
-    /**
-     * This translates incoming hard key events in to edit operations on an
-     * InputConnection.  It is only needed when using the
-     * PROCESS_HARD_KEYS option.
-     */
-    private boolean translateKeyDown(int keyCode, KeyEvent event) {
-        metaState = MetaKeyKeyListener.handleKeyDown(metaState,
-                keyCode, event);
-        int c = event.getUnicodeChar(MetaKeyKeyListener.getMetaState(metaState));
-        metaState = MetaKeyKeyListener.adjustMetaAfterKeypress(metaState);
-        InputConnection ic = getCurrentInputConnection();
-        if (c == 0 || ic == null) {
-            return false;
-        }
-        
-        boolean dead = false;
-
-        if ((c & KeyCharacterMap.COMBINING_ACCENT) != 0) {
-            dead = true;
-            c = c & KeyCharacterMap.COMBINING_ACCENT_MASK;
-        }
-        
-        onKey(c, null);
-        
-        return true;
     }
     
     /**
