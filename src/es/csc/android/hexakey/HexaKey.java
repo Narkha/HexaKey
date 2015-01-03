@@ -293,25 +293,32 @@ public class HexaKey extends InputMethodService
         if (isWordSeparator(primaryCode)) {
             sendKey(primaryCode);
             updateShiftKeyState(getCurrentInputEditorInfo());
-        } else if (primaryCode == Keyboard.KEYCODE_DELETE) {
+        } 
+        else if (primaryCode == Keyboard.KEYCODE_DELETE) {
             handleBackspace();
-        } else if (primaryCode == Keyboard.KEYCODE_SHIFT) {
+        } 
+        else if (primaryCode == Keyboard.KEYCODE_SHIFT) {
             handleShift();
-        } else if (primaryCode == LatinKeyboardView.KEYCODE_LANGUAGE_SWITCH) {
+        } 
+        else if (primaryCode == LatinKeyboard.KEYCODE_LANGUAGE_SWITCH) {
             handleLanguageSwitch();
             return;
-        } else if (primaryCode == LatinKeyboardView.KEYCODE_OPTIONS) {
+        } 
+        else if (primaryCode == LatinKeyboardView.KEYCODE_OPTIONS) {
             // Show a menu or somethin'
-        } else if (primaryCode == Keyboard.KEYCODE_MODE_CHANGE
+        } 
+        else if (primaryCode == Keyboard.KEYCODE_MODE_CHANGE
                 && inputView != null) {
             Keyboard current = inputView.getKeyboard();
             if (current == symbolsKeyboard || current == symbolsShiftedKeyboard) {
                 setLatinKeyboard(lettersKeyboard);
-            } else {
+            } 
+            else {
                 setLatinKeyboard(symbolsKeyboard);
                 symbolsKeyboard.setShifted(false);
             }
-        } else {
+        } 
+        else {
             handleCharacter(primaryCode, keyCodes);
         }
     }

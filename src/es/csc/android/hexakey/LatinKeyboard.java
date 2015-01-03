@@ -30,6 +30,8 @@ import android.view.inputmethod.InputMethodManager;
 
 public class LatinKeyboard extends Keyboard {
 
+    static final int KEYCODE_LANGUAGE_SWITCH = -101;
+    
 	private List<Key> enterKeys;
     private Key spaceKey;
     /**
@@ -82,7 +84,7 @@ public class LatinKeyboard extends Keyboard {
             modeChangeKey = key;
             savedModeChangeKey = new LatinKey(res, parent, x, y, parser);
         } 
-        else if (key.codes[0] == LatinKeyboardView.KEYCODE_LANGUAGE_SWITCH) {
+        else if (key.codes[0] == LatinKeyboard.KEYCODE_LANGUAGE_SWITCH) {
             languageSwitchKey = key;
             savedLanguageSwitchKey = new LatinKey(res, parent, x, y, parser);
         }
