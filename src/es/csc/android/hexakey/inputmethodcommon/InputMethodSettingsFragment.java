@@ -26,6 +26,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
 
 /**
  * This is a helper class for an IME's settings preference fragment. It's recommended for every
@@ -33,13 +34,14 @@ import android.preference.PreferenceFragment;
  */
 public abstract class InputMethodSettingsFragment extends PreferenceFragment
         implements InputMethodSettingsInterface {
-    private final InputMethodSettingsImpl mSettings = new InputMethodSettingsImpl();
+    private final InputMethodSettingsImpl settings = new InputMethodSettingsImpl();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final Context context = getActivity();
-        setPreferenceScreen(getPreferenceManager().createPreferenceScreen(context));
-        mSettings.init(context, getPreferenceScreen());
+        final Context context = getActivity();        
+        PreferenceScreen preferenceScreen = getPreferenceManager().createPreferenceScreen(context);
+        settings.init(context, preferenceScreen);
+        setPreferenceScreen(preferenceScreen);
     }
 
     /**
@@ -47,7 +49,7 @@ public abstract class InputMethodSettingsFragment extends PreferenceFragment
      */
     @Override
     public void setInputMethodSettingsCategoryTitle(int resId) {
-        mSettings.setInputMethodSettingsCategoryTitle(resId);
+        settings.setInputMethodSettingsCategoryTitle(resId);
     }
 
     /**
@@ -55,7 +57,7 @@ public abstract class InputMethodSettingsFragment extends PreferenceFragment
      */
     @Override
     public void setInputMethodSettingsCategoryTitle(CharSequence title) {
-        mSettings.setInputMethodSettingsCategoryTitle(title);
+        settings.setInputMethodSettingsCategoryTitle(title);
     }
 
     /**
@@ -63,7 +65,7 @@ public abstract class InputMethodSettingsFragment extends PreferenceFragment
      */
     @Override
     public void setSubtypeEnablerTitle(int resId) {
-        mSettings.setSubtypeEnablerTitle(resId);
+        settings.setSubtypeEnablerTitle(resId);
     }
 
     /**
@@ -71,7 +73,7 @@ public abstract class InputMethodSettingsFragment extends PreferenceFragment
      */
     @Override
     public void setSubtypeEnablerTitle(CharSequence title) {
-        mSettings.setSubtypeEnablerTitle(title);
+        settings.setSubtypeEnablerTitle(title);
     }
 
     /**
@@ -79,7 +81,7 @@ public abstract class InputMethodSettingsFragment extends PreferenceFragment
      */
     @Override
     public void setSubtypeEnablerIcon(int resId) {
-        mSettings.setSubtypeEnablerIcon(resId);
+        settings.setSubtypeEnablerIcon(resId);
     }
 
     /**
@@ -87,7 +89,7 @@ public abstract class InputMethodSettingsFragment extends PreferenceFragment
      */
     @Override
     public void setSubtypeEnablerIcon(Drawable drawable) {
-        mSettings.setSubtypeEnablerIcon(drawable);
+        settings.setSubtypeEnablerIcon(drawable);
     }
 
     /**
@@ -96,6 +98,6 @@ public abstract class InputMethodSettingsFragment extends PreferenceFragment
     @Override
     public void onResume() {
         super.onResume();
-        mSettings.updateSubtypeEnabler();
+        settings.updateSubtypeEnabler();
     }
 }
