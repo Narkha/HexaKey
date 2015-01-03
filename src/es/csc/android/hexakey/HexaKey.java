@@ -395,7 +395,7 @@ public class HexaKey extends InputMethodService
     }
 
     private void handleLanguageSwitch() {
-        inputMethodManager.switchToNextInputMethod(getToken(), false /* onlyCurrentIme */);
+        inputMethodManager.switchToNextInputMethod(getToken(), true);
     }
 
     private void checkToggleCapsLock() {
