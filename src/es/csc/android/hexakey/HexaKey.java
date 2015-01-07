@@ -313,14 +313,27 @@ public class HexaKey extends InputMethodService
         }
     }
     
-    private void handleCharacter(int primaryCode, int[] keyCodes) {
+     private void handleCharacter(int primaryCode, int[] keyCodes) {
         if (isInputViewShown()) {
             if (inputView.isShifted()) {
                 primaryCode = Character.toUpperCase(primaryCode);
             }
         }
+                        
         getCurrentInputConnection().commitText(
                     String.valueOf((char) primaryCode), 1);
+        
+        if (isAlphabet(primaryCode)) {            
+        	updateCapsLockState(getCurrentInputEditorInfo());
+        }
+    }
+    
+    private boolean isAlphabet(int code) {
+        if (Character.isLetter(code)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void handleClose() {
