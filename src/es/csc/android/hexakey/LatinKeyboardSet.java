@@ -1,3 +1,17 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package es.csc.android.hexakey;
 
 import android.content.Context;
@@ -20,8 +34,11 @@ public class LatinKeyboardSet {
     private long lastShiftTime;
     private boolean capsLock;
     
-	public LatinKeyboardSet(Context context) {
-        lettersKeyboard = new LatinKeyboard(context, R.xml.letters);
+	public LatinKeyboardSet(Context context, String locale) {		
+		android.util.Log.d("XXX", LatinKeyboardSetCache.LETTERS_XML_PREFIX + locale);
+		int lettersResourceId = context.getResources().getIdentifier("letters_" + locale, "xml", context.getPackageName());
+        lettersKeyboard = new LatinKeyboard(context, lettersResourceId);        					
+        						
         symbolsKeyboard = new LatinKeyboard(context, R.xml.symbols);
         symbolsShiftedKeyboard = new LatinKeyboard(context, R.xml.symbols_shift);
         
