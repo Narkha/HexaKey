@@ -7,7 +7,9 @@
         android:minSdkVersion="17"
         android:targetSdkVersion="20" />
         
-    <application android:label="@string/ime_name">
+    <application android:allowBackup="false" 
+        		android:label="@string/ime_name"        
+               	android:icon="@drawable/ic_launcher">
         <service android:name="HexaKey"
                 android:permission="android.permission.BIND_INPUT_METHOD">
             <intent-filter>
@@ -16,7 +18,9 @@
             <meta-data android:name="android.view.im" android:resource="@xml/method" />
         </service>
 
-        <activity android:name="es.csc.android.hexakey.ImePreferences" android:label="@string/settings_name">
+        <activity android:name="es.csc.android.hexakey.ImePreferences" 
+            	android:label="@string/settings_name"
+            	android:icon="@drawable/ic_launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
