@@ -35,7 +35,6 @@ public class LatinKeyboardSet {
     private boolean capsLock;
     
 	public LatinKeyboardSet(Context context, String locale) {		
-		android.util.Log.d("XXX", LatinKeyboardSetCache.LETTERS_XML_PREFIX + locale);
 		int lettersResourceId = context.getResources().getIdentifier("letters_" + locale, "xml", context.getPackageName());
         lettersKeyboard = new LatinKeyboard(context, lettersResourceId);        					
         						
