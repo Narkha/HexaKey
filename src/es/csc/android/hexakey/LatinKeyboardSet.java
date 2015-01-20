@@ -21,12 +21,12 @@ import android.view.inputmethod.EditorInfo;
 
 public class LatinKeyboardSet {
 	public static final int LETTERS_KEYBOARD = 1;
-	public static final int SYMBOLS_KEYBOARD = 2;
-	public static final int SGIFT_SYMBOLS_KEYBOARD = 3;
+	public static final int NUMBERS_KEYBOARD = 2;
 	
+    private LatinKeyboard lettersKeyboard;
     private LatinKeyboard symbolsKeyboard;
     private LatinKeyboard symbolsShiftedKeyboard;
-    private LatinKeyboard lettersKeyboard;
+    private LatinKeyboard numbersKeyboard;
     
     private LatinKeyboard defaultKeyboard;
     private LatinKeyboard currentKeyboard;
@@ -40,6 +40,8 @@ public class LatinKeyboardSet {
         						
         symbolsKeyboard = new LatinKeyboard(context, R.xml.symbols);
         symbolsShiftedKeyboard = new LatinKeyboard(context, R.xml.symbols_shift);
+        
+        numbersKeyboard = new LatinKeyboard(context, R.xml.numbers);
         
         defaultKeyboard = currentKeyboard = lettersKeyboard;
 	}
@@ -58,11 +60,12 @@ public class LatinKeyboardSet {
 	}
 
 	public int typeFromAttribute(EditorInfo attribute) {		
+		// TODO cover all the cases
         switch (attribute.inputType & InputType.TYPE_MASK_CLASS) {
-            case InputType.TYPE_CLASS_NUMBER:
-            case InputType.TYPE_CLASS_DATETIME:                
+        	case InputType.TYPE_CLASS_DATETIME:
+            case InputType.TYPE_CLASS_NUMBER:                            
             case InputType.TYPE_CLASS_PHONE:
-            	return SYMBOLS_KEYBOARD;
+            	return NUMBERS_KEYBOARD;
                 
             case InputType.TYPE_CLASS_TEXT:            	                
             default:
@@ -71,21 +74,27 @@ public class LatinKeyboardSet {
 	}
 
 	public void updateKeyboardType(int type) {        
-        switch (type) {
-            case SYMBOLS_KEYBOARD:            
-                currentKeyboard = symbolsKeyboard;
-                break;
+        switch (type) {                    
+            case NUMBERS_KEYBOARD:
+            	defaultKeyboard = currentKeyboard = numbersKeyboard;
+            	break;
                 
             case LETTERS_KEYBOARD:       
             default:
-            	currentKeyboard = lettersKeyboard;
+            	defaultKeyboard = currentKeyboard = lettersKeyboard;
         }
+	}
+	
+
+	
+	public boolean isKeyboardType(EditorInfo attribute) {	
+		return isKeyboardType(typeFromAttribute(attribute));
 	}
 	
 	public boolean isKeyboardType(int keyboardType) {	     
         switch (keyboardType) {
-            case SYMBOLS_KEYBOARD:            
-                return currentKeyboard == symbolsKeyboard;
+            case NUMBERS_KEYBOARD:            
+                return currentKeyboard == numbersKeyboard;
                 
             case LETTERS_KEYBOARD:       
             default:

@@ -20,6 +20,7 @@
 
 <resources>
     <item name="key_width" type="fraction">11.86%p</item>
+    <item name="num_key_width" type="fraction">25%p</item>
     <dimen name="key_height">52dip</dimen>
     <dimen name="key_vertical_gap">-13dip</dimen>
     <item name="row_horizontal_gap" type="fraction">5.93%p</item>

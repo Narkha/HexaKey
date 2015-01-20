@@ -125,7 +125,11 @@ public class HexaKey extends InputMethodService
     public void onStartInput(EditorInfo attribute, boolean restarting) {
         super.onStartInput(attribute, restarting);
         
-        keyboardSet.updateKeyboardType(attribute);        
+        if (inputView != null && ! keyboardSet.isKeyboardType(attribute)) {
+        	inputView.clearBackground();
+        }
+        
+        keyboardSet.updateKeyboardType(attribute);
         updateCapsLockState(attribute);
         keyboardSet.setImeOptions(getResources(), attribute.imeOptions);
     }

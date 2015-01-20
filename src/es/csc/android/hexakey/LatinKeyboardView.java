@@ -31,8 +31,13 @@ import android.view.inputmethod.InputMethodSubtype;
 public class LatinKeyboardView extends KeyboardView {
 
     static final int KEYCODE_OPTIONS = -100;
+    static final int DEFAULT_BACKGROUND_COLOR = 0xff000000;
     
-    boolean isCapturedBackground = false;
+    private boolean isBackgroundColorCaptured = false;
+    private int backgroundColor;
+    
+    private boolean isBackgroundCaptured = false;
+    
 
     public LatinKeyboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -41,22 +46,26 @@ public class LatinKeyboardView extends KeyboardView {
     public LatinKeyboardView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
-
     
     @Override
     public void onDraw (Canvas canvas) {
-    	if(!isCapturedBackground) {
-    		isCapturedBackground = true;
+    	if(!isBackgroundCaptured) {
+    		if (!isBackgroundColorCaptured) {
+    			isBackgroundColorCaptured = true;
+    			captureBackgroundColor();
+    		}
+    		
+    		isBackgroundCaptured = true;
 
             Bitmap bitmap = createBitmapForCanvas(canvas);   
             
-            canvas.setBitmap(bitmap);                      
-            setActualBackgroundColor(canvas);
+            canvas.setBitmap(bitmap);
+            
+            setBackgroundColor(canvas);
             
             super.onDraw(canvas);
                                    
-            BitmapDrawable newBackground = getKeyboardScreenshot(bitmap);
-                        
+            BitmapDrawable newBackground = getKeyboardScreenshot(bitmap);                        
             this.setBackground(newBackground);                       
     	}
     	else {
@@ -68,25 +77,27 @@ public class LatinKeyboardView extends KeyboardView {
 		int width = Math.max(1, canvas.getWidth());
 		int height = Math.max(1, canvas.getHeight()); 				
 		
-		Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		return bitmap;
+		return Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 	}
 
-	private void setActualBackgroundColor(Canvas canvas) {
+	private void captureBackgroundColor() {
 		try {
 			ColorDrawable background = (ColorDrawable) this.getBackground();
-			int color = background.getColor();
-		
-			int alpha = (color & 0xff000000) >> 24;
-			int red = (color & 0x00ff0000) >> 16;
-			int green = (color & 0x0000ff00) >> 8;
-			int blue = (color & 0x000000ff);
-			
-			canvas.drawARGB(alpha, red, green, blue);
+			backgroundColor = background.getColor();
 		}
 		catch (ClassCastException e) {
-			Log.e("Hexakey", "The background is not a color", e);
+			Log.w("Hexakey", "The background is not a color, setting default color");
+			backgroundColor = DEFAULT_BACKGROUND_COLOR;
 		}
+	}
+	
+	private void setBackgroundColor(Canvas canvas) {
+		int alpha = (backgroundColor & 0xf0000000) >> 24;
+		int red = (backgroundColor & 0x00f00000) >> 16;
+		int green = (backgroundColor & 0x0000f000) >> 8;
+		int blue = (backgroundColor & 0x000000f0);
+		
+		canvas.drawARGB(alpha, red, green, blue);
 	}
 
 	private BitmapDrawable getKeyboardScreenshot(Bitmap bitmap) {
@@ -99,6 +110,12 @@ public class LatinKeyboardView extends KeyboardView {
 		}
 		
 		return new BitmapDrawable(getResources(), KeyboardScreenshot);
+	}
+	
+
+
+	public void clearBackground() {
+		isBackgroundCaptured = false;
 	}
 
 	private boolean isPortraitOrientation(Bitmap bitmap) {
