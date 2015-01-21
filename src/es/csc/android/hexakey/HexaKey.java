@@ -67,17 +67,18 @@ public class HexaKey extends InputMethodService
      */
     @Override 
     public void onInitializeInterface() {
-        if (keyboardSet != null) {
-            // Configuration changes can happen after the keyboard gets recreated,
-            // so we need to be able to re-build the keyboards if the available
-            // space has changed.
-            int displayWidth = getMaxWidth();
-            if (displayWidth == lastDisplayWidth) return;
-            lastDisplayWidth = displayWidth;
+        if (keyboardSet != null && !isScreenRotation()) {
+            return;            
         }
+        
+        lastDisplayWidth = getMaxWidth();
         
         final InputMethodSubtype subtype = inputMethodManager.getCurrentInputMethodSubtype();
         keyboardSet = new LatinKeyboardSet(this, subtype);
+    }
+    
+    private boolean isScreenRotation() {
+    	return getMaxWidth() != lastDisplayWidth;
     }
     
     /**
