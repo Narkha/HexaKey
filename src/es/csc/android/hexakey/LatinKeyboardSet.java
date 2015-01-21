@@ -18,10 +18,13 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.text.InputType;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodSubtype;
 
 public class LatinKeyboardSet {
 	public static final int LETTERS_KEYBOARD = 1;
 	public static final int NUMBERS_KEYBOARD = 2;
+	
+	private static LetterRecourcesCache letterResourcesCache;
 	
     private LatinKeyboard lettersKeyboard;
     private LatinKeyboard symbolsKeyboard;
@@ -34,8 +37,12 @@ public class LatinKeyboardSet {
     private long lastShiftTime;
     private boolean capsLock;
     
-	public LatinKeyboardSet(Context context, String locale) {		
-		int lettersResourceId = context.getResources().getIdentifier("letters_" + locale, "xml", context.getPackageName());
+    static {
+    	letterResourcesCache = new LetterRecourcesCache();
+    }
+    
+	public LatinKeyboardSet(Context context, InputMethodSubtype subtype) {		
+		int lettersResourceId = letterResourcesCache.get(context, subtype);
         lettersKeyboard = new LatinKeyboard(context, lettersResourceId);        					
         						
         symbolsKeyboard = new LatinKeyboard(context, R.xml.symbols);

@@ -77,7 +77,7 @@ public class HexaKey extends InputMethodService
         }
         
         final InputMethodSubtype subtype = inputMethodManager.getCurrentInputMethodSubtype();
-        keyboardSet = LatinKeyboardSetCache.getKeyboardLayoutSet(this, subtype);
+        keyboardSet = new LatinKeyboardSet(this, subtype);
     }
     
     /**
@@ -364,7 +364,7 @@ public class HexaKey extends InputMethodService
         final InputMethodSubtype newSubtype = inputMethodManager.getCurrentInputMethodSubtype();
         
         if (previousSubtype != newSubtype) {        	
-        	keyboardSet = LatinKeyboardSetCache.getKeyboardLayoutSet(this, newSubtype);
+        	keyboardSet = new LatinKeyboardSet(this, newSubtype);
         	setLatinKeyboard(keyboardSet.getCurrentKeyboard());
         }
     }
