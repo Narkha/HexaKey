@@ -52,8 +52,7 @@ public class LatinKeyboardSet {
         
         defaultKeyboard = currentKeyboard = lettersKeyboard;
 	}
-
-
+	
 	public void resetStatus() {
 		currentKeyboard = defaultKeyboard;
 	}
@@ -92,8 +91,6 @@ public class LatinKeyboardSet {
         }
 	}
 	
-
-	
 	public boolean isKeyboardType(EditorInfo attribute) {	
 		return isKeyboardType(typeFromAttribute(attribute));
 	}
@@ -127,37 +124,43 @@ public class LatinKeyboardSet {
 	public boolean isCapsLockEnabled() {
 		return capsLock;
 	}
-	public boolean isLettersUpperCase() {
-		return capsLock || !currentKeyboard.isShifted();
-	}
 
-	public boolean handleShift() {
-        if (lettersKeyboard == currentKeyboard) {
-            // Alphabet keyboard
-            checkToggleCapsLock();
-            return false;
+	/**
+	 * update the information when the key is pressed
+	 * 
+	 * @result true if the keyboard has changed (symbols to symbols shifted or viceversa)
+	 * @result false if the keyboard has not changed (is necesay call outside setH
+	 */
+	public void handleShift() {
+        if (lettersKeyboard == currentKeyboard) {   
+    		checkToggleCapsLock();
         } 
         else if (currentKeyboard == symbolsKeyboard) {
         	currentKeyboard = symbolsShiftedKeyboard;
         	symbolsShiftedKeyboard.setShifted(true);
-            return true;
         } 
         else {
         	currentKeyboard = symbolsKeyboard;
             symbolsKeyboard.setShifted(true);
-        	return true;
         }
 	}
 	
     private void checkToggleCapsLock() {
-        long now = System.currentTimeMillis();
-        if (lastShiftTime + 800 > now) {
-            capsLock = !capsLock;
-            lastShiftTime = 0;
-        } 
-        else {
-            lastShiftTime = now;
-        }        
+    	long now = System.currentTimeMillis();
+    	if (capsLock) {
+    		capsLock = false;
+    		lastShiftTime = 0;
+    	}
+    	else {
+    		if (lettersKeyboard.isShifted() && (lastShiftTime + 400 > now)) {
+	            capsLock = true;
+	            lastShiftTime = 0;
+	    	}
+	    	else {
+	        	capsLock = false;
+	            lastShiftTime = now;
+	        }
+    	}
     }
 
 }

@@ -214,15 +214,19 @@ public class HexaKey extends InputMethodService
     private void updateCapsLockState(EditorInfo attr) {
         if (attr != null && inputView != null 
         		&& keyboardSet.isKeyboardType(LatinKeyboardSet.LETTERS_KEYBOARD)) {
-            boolean firstLetterAndCapital = false;
-            EditorInfo ei = getCurrentInputEditorInfo();
-            if (ei != null && ei.inputType != InputType.TYPE_NULL) {
-                firstLetterAndCapital = getCurrentInputConnection()
-                							.getCursorCapsMode(attr.inputType) != 0;
-            }            
-            inputView.setShifted( keyboardSet.isCapsLockEnabled() || firstLetterAndCapital);
+            inputView.setShifted( keyboardSet.isCapsLockEnabled() || isFirstCapitalLetter(attr));
         }
     }
+
+	private boolean isFirstCapitalLetter(EditorInfo attr) {
+		boolean firstLetterAndCapital = false;
+		EditorInfo ei = getCurrentInputEditorInfo();
+		if (ei != null && ei.inputType != InputType.TYPE_NULL) {
+		    firstLetterAndCapital = getCurrentInputConnection()
+		    							.getCursorCapsMode(attr.inputType) != 0;
+		}
+		return firstLetterAndCapital;
+	}
     
     /**
      * Helper to send a key down / key up pair to the current editor.
@@ -310,12 +314,13 @@ public class HexaKey extends InputMethodService
             return;
         }
         
-        boolean keyboardChanged = keyboardSet.handleShift();
-        if (keyboardChanged) {
-        	setLatinKeyboard(keyboardSet.getCurrentKeyboard());
+        LatinKeyboard preShifted = keyboardSet.getCurrentKeyboard();
+        keyboardSet.handleShift();
+        if (preShifted == keyboardSet.getCurrentKeyboard()) {
+        	inputView.setShifted( keyboardSet.isCapsLockEnabled() || !inputView.isShifted() );        	
         }    
-        else if (keyboardSet.isKeyboardType(LatinKeyboardSet.LETTERS_KEYBOARD)) {
-        	inputView.setShifted( keyboardSet.isLettersUpperCase() );
+        else {
+        	setLatinKeyboard(keyboardSet.getCurrentKeyboard());
         }
     }
     
