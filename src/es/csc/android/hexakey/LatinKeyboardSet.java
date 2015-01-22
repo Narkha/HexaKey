@@ -55,6 +55,7 @@ public class LatinKeyboardSet {
 	
 	public void resetStatus() {
 		currentKeyboard = defaultKeyboard;
+		capsLock = false;
 	}
 	
 	public LatinKeyboard getCurrentKeyboard() {
