@@ -214,16 +214,18 @@ public class HexaKey extends InputMethodService
     private void updateCapsLockState(EditorInfo attr) {
         if (attr != null && inputView != null 
         		&& keyboardSet.isKeyboardType(LatinKeyboardSet.LETTERS_KEYBOARD)) {
-            inputView.setShifted( keyboardSet.isCapsLockEnabled() || isFirstCapitalLetter(attr));
+            inputView.setShifted( keyboardSet.isCapsLockEnabled() || isFirstCapitalLetter(attr) );            
         }
     }
 
 	private boolean isFirstCapitalLetter(EditorInfo attr) {
 		boolean firstLetterAndCapital = false;
+		
 		EditorInfo ei = getCurrentInputEditorInfo();
 		if (ei != null && ei.inputType != InputType.TYPE_NULL) {
-		    firstLetterAndCapital = getCurrentInputConnection()
-		    							.getCursorCapsMode(attr.inputType) != 0;
+			// For some weird reason, sometimes the result is false in the first call and true in the second...
+		    firstLetterAndCapital = getCurrentInputConnection().getCursorCapsMode(attr.inputType) != 0
+		    						|| getCurrentInputConnection().getCursorCapsMode(attr.inputType) != 0;		 
 		}
 		return firstLetterAndCapital;
 	}
@@ -313,6 +315,7 @@ public class HexaKey extends InputMethodService
         if (inputView == null) {
             return;
         }
+        android.util.Log.d("___", "handleShift");
         
         LatinKeyboard preShifted = keyboardSet.getCurrentKeyboard();
         keyboardSet.handleShift();
