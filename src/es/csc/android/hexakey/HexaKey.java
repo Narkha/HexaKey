@@ -79,6 +79,25 @@ public class HexaKey extends InputMethodService
     
     private boolean isScreenRotation() {
     	return getMaxWidth() != lastDisplayWidth;
+    }    
+
+    /**
+     * This is the main point where we do our initialization of the input method
+     * to begin operating on an application.  At this point we have been
+     * bound to the client, and are now receiving all of the detailed information
+     * about the target of our edits.
+     */
+    @Override 
+    public void onStartInput(EditorInfo attribute, boolean restarting) {
+        super.onStartInput(attribute, restarting);
+        
+        if (inputView != null && ! keyboardSet.isKeyboardType(attribute)) {
+        	inputView.clearBackground();
+        }
+        
+        keyboardSet.updateKeyboardType(attribute);
+        updateCapsLockState(attribute);
+        keyboardSet.setImeOptions(getResources(), attribute.imeOptions);
     }
     
     /**
@@ -114,39 +133,7 @@ public class HexaKey extends InputMethodService
     @Override 
     public View onCreateCandidatesView() {
        return null;
-    }
-
-    /**
-     * This is the main point where we do our initialization of the input method
-     * to begin operating on an application.  At this point we have been
-     * bound to the client, and are now receiving all of the detailed information
-     * about the target of our edits.
-     */
-    @Override 
-    public void onStartInput(EditorInfo attribute, boolean restarting) {
-        super.onStartInput(attribute, restarting);
-        
-        if (inputView != null && ! keyboardSet.isKeyboardType(attribute)) {
-        	inputView.clearBackground();
-        }
-        
-        keyboardSet.updateKeyboardType(attribute);
-        updateCapsLockState(attribute);
-        keyboardSet.setImeOptions(getResources(), attribute.imeOptions);
-    }
-
-    /**
-     * This is called when the user is done editing a field.  We can use
-     * this to reset our state.
-     */
-    @Override 
-    public void onFinishInput() {
-        super.onFinishInput();
-        
-        if (inputView != null) {
-            inputView.closing();
-        }
-    }
+    }    
     
     @Override 
     public void onStartInputView(EditorInfo attribute, boolean restarting) {
@@ -162,6 +149,19 @@ public class HexaKey extends InputMethodService
     public void onFinishInputView (boolean finishingInput) {
         keyboardSet.resetStatus();
         super.onFinishInputView(finishingInput);
+    }
+
+    /**
+     * This is called when the user is done editing a field.  We can use
+     * this to reset our state.
+     */
+    @Override 
+    public void onFinishInput() {
+        super.onFinishInput();
+        
+        if (inputView != null) {
+            inputView.closing();
+        }
     }
     
     @Override
