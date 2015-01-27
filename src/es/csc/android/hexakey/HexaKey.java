@@ -45,6 +45,8 @@ public class HexaKey extends InputMethodService
     private LatinKeyboardView inputView;
     
     private int lastDisplayWidth;
+    private boolean isRotation;
+    private boolean wasShiftedBeforeRotation;
     
     private LatinKeyboardSet keyboardSet;
     
@@ -67,17 +69,18 @@ public class HexaKey extends InputMethodService
      */
     @Override 
     public void onInitializeInterface() {
-        if (keyboardSet != null && !isScreenRotation()) {
-            return;            
+        if (keyboardSet == null) {
+            final InputMethodSubtype subtype = inputMethodManager.getCurrentInputMethodSubtype();
+        	keyboardSet = new LatinKeyboardSet(this, subtype);
+        }
+        else if (isScreenSizeChange()) {
+        	keyboardSet.recreateKeyboards();
         }
         
         lastDisplayWidth = getMaxWidth();
-        
-        final InputMethodSubtype subtype = inputMethodManager.getCurrentInputMethodSubtype();
-        keyboardSet = new LatinKeyboardSet(this, subtype);
     }
     
-    private boolean isScreenRotation() {
+    private boolean isScreenSizeChange() {
     	return getMaxWidth() != lastDisplayWidth;
     }    
 
@@ -91,12 +94,17 @@ public class HexaKey extends InputMethodService
     public void onStartInput(EditorInfo attribute, boolean restarting) {
         super.onStartInput(attribute, restarting);
         
-        if (inputView != null && ! keyboardSet.isKeyboardType(attribute)) {
+        isRotation = restarting;
+        wasShiftedBeforeRotation = inputView == null? false : inputView.isShifted();
+        
+        if (inputView != null && !keyboardSet.isKeyboardType(attribute)) {
         	inputView.clearBackground();
         }
         
-        keyboardSet.updateKeyboardType(attribute);
-        updateCapsLockState(attribute);
+        if (!restarting) {
+	        keyboardSet.updateKeyboardType(attribute);        	        
+        }
+                
         keyboardSet.setImeOptions(getResources(), attribute.imeOptions);
     }
     
@@ -107,25 +115,15 @@ public class HexaKey extends InputMethodService
      * a configuration change.
      */
     @Override 
-    public View onCreateInputView() {
+    public View onCreateInputView() {        
         inputView = (LatinKeyboardView) getLayoutInflater()
         				.inflate(R.layout.input, null);
-		inputView.autoAdjustPadding(getMaxWidth());
+        inputView.autoAdjustPadding(getMaxWidth());
         inputView.setOnKeyboardActionListener(this);
-        setLatinKeyboard(keyboardSet.getCurrentKeyboard());
+        
         return inputView;
     }
-
-    @TargetApi(Build.VERSION_CODES.KITKAT) 
-    private void setLatinKeyboard(LatinKeyboard nextKeyboard) {
-    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-	        final boolean shouldSupportLanguageSwitchKey =
-	                inputMethodManager.shouldOfferSwitchingToNextInputMethod(getToken());
-	        nextKeyboard.setLanguageSwitchKeyVisibility(shouldSupportLanguageSwitchKey);
-    	}
-        inputView.setKeyboard(nextKeyboard);
-    }
-
+    
     /**
      * Called by the framework when your view for showing candidates needs to
      * be generated, like {@link #onCreateInputView}.
@@ -141,13 +139,33 @@ public class HexaKey extends InputMethodService
         
         setLatinKeyboard(keyboardSet.getCurrentKeyboard());
         inputView.closing();
+        
+        if (isRotation) {
+        	inputView.setShifted(wasShiftedBeforeRotation);
+        }
+        else {
+        	updateCapsLockState(attribute);
+        }
+        
         final InputMethodSubtype subtype = inputMethodManager.getCurrentInputMethodSubtype();
         inputView.setSubtypeOnSpaceKey(subtype);
+    }
+    
+    @TargetApi(Build.VERSION_CODES.KITKAT) 
+    private void setLatinKeyboard(LatinKeyboard nextKeyboard) {
+    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+	        final boolean shouldSupportLanguageSwitchKey =
+	                inputMethodManager.shouldOfferSwitchingToNextInputMethod(getToken());
+	        nextKeyboard.setLanguageSwitchKeyVisibility(shouldSupportLanguageSwitchKey);
+    	}
+        inputView.setKeyboard(nextKeyboard);
     }
 
     @Override
     public void onFinishInputView (boolean finishingInput) {
+    	isRotation = false;
         keyboardSet.resetStatus();
+        inputView.setShifted(false);
         super.onFinishInputView(finishingInput);
     }
 
@@ -315,7 +333,6 @@ public class HexaKey extends InputMethodService
         if (inputView == null) {
             return;
         }
-        android.util.Log.d("___", "handleShift");
         
         LatinKeyboard preShifted = keyboardSet.getCurrentKeyboard();
         keyboardSet.handleShift();

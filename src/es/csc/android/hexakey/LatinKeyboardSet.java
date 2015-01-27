@@ -26,6 +26,9 @@ public class LatinKeyboardSet {
 	
 	private static LetterRecourcesCache letterResourcesCache;
 	
+	private Context context;
+	private int lettersResourceId;
+	
     private LatinKeyboard lettersKeyboard;
     private LatinKeyboard symbolsKeyboard;
     private LatinKeyboard symbolsShiftedKeyboard;
@@ -41,8 +44,10 @@ public class LatinKeyboardSet {
     	letterResourcesCache = new LetterRecourcesCache();
     }
     
-	public LatinKeyboardSet(Context context, InputMethodSubtype subtype) {		
-		int lettersResourceId = letterResourcesCache.get(context, subtype);
+	public LatinKeyboardSet(Context context, InputMethodSubtype subtype) {
+		this.context = context;
+		
+		lettersResourceId = letterResourcesCache.get(context, subtype);
         lettersKeyboard = new LatinKeyboard(context, lettersResourceId);        					
         						
         symbolsKeyboard = new LatinKeyboard(context, R.xml.symbols);
@@ -51,6 +56,54 @@ public class LatinKeyboardSet {
         numbersKeyboard = new LatinKeyboard(context, R.xml.numbers);
         
         defaultKeyboard = currentKeyboard = lettersKeyboard;
+	}
+	
+	public void recreateKeyboards() {
+		LatinKeyboard newLettersKeyboard = new LatinKeyboard(context, lettersResourceId);        					
+		
+		LatinKeyboard newSymbolsKeyboard = new LatinKeyboard(context, R.xml.symbols);
+		LatinKeyboard newSymbolsShiftedKeyboard = new LatinKeyboard(context, R.xml.symbols_shift);
+        
+		LatinKeyboard newNumbersKeyboard = new LatinKeyboard(context, R.xml.numbers);
+		
+		updateDefaultKeyboard(newLettersKeyboard, newNumbersKeyboard);
+		
+		updateCurrentKeyboard(newLettersKeyboard, newSymbolsKeyboard,
+				newSymbolsShiftedKeyboard, newNumbersKeyboard);
+		
+		lettersKeyboard = newLettersKeyboard;
+		symbolsKeyboard = newSymbolsKeyboard;
+		symbolsShiftedKeyboard = newSymbolsShiftedKeyboard;
+		numbersKeyboard = newNumbersKeyboard;	
+	}
+
+	private void updateDefaultKeyboard(LatinKeyboard newLettersKeyboard,
+			LatinKeyboard newNumbersKeyboard) {
+		if (defaultKeyboard == lettersKeyboard) {
+			defaultKeyboard = newLettersKeyboard;
+		}
+		else {			
+			defaultKeyboard = newNumbersKeyboard;
+		}
+	}
+
+	private void updateCurrentKeyboard(LatinKeyboard newLettersKeyboard,
+			LatinKeyboard newSymbolsKeyboard,
+			LatinKeyboard newSymbolsShiftedKeyboard,
+			LatinKeyboard newNumbersKeyboard) {
+		
+		if (currentKeyboard == lettersKeyboard) {
+			this.currentKeyboard = newLettersKeyboard;
+		}
+		else if (currentKeyboard == symbolsKeyboard) {
+			currentKeyboard = newSymbolsKeyboard;
+		}
+		else if (currentKeyboard == symbolsShiftedKeyboard) {
+			currentKeyboard = newSymbolsShiftedKeyboard;
+		}
+		else {			
+			this.currentKeyboard = newNumbersKeyboard;
+		}
 	}
 	
 	public void resetStatus() {
@@ -103,7 +156,20 @@ public class LatinKeyboardSet {
                 
             case LETTERS_KEYBOARD:       
             default:
-            	return currentKeyboard == lettersKeyboard;
+            	return currentKeyboard == lettersKeyboard || 
+                		currentKeyboard == symbolsKeyboard ||
+                		currentKeyboard == symbolsShiftedKeyboard;
+        }
+	}
+	
+
+	
+	public int getKeyboardType() {	     
+        if (currentKeyboard == numbersKeyboard) {
+        	return NUMBERS_KEYBOARD;
+        }
+        else {
+        	return LETTERS_KEYBOARD;
         }
 	}
 
@@ -163,5 +229,4 @@ public class LatinKeyboardSet {
 	        }
     	}
     }
-
 }
